@@ -4,7 +4,7 @@ The release workflow uses the section named after the version being released
 as the release description, so every version needs one. `npm version <x.y.z>`
 renames the `Unreleased` heading below to that version.
 
-## Unreleased
+## 0.1.1
 
 - Needs Obsidian 1.2.7 or later (was 1.0.0). Older versions build the file explorer differently, so no color ever showed there, and the color picker failed to open.
 - On Obsidian versions without CSS `color-mix()`, background colors set as hex still show, at the chosen strength.
