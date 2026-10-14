@@ -39,7 +39,26 @@ export function textDeclarations(value: string | null): string {
 export function backgroundDeclaration(value: string | null, strength: number): string {
   if (value === null) return 'background-color: unset;';
   const s = Math.min(100, Math.max(5, Math.round(strength)));
-  return `background-color: color-mix(in srgb, ${value} ${s}%, transparent);`;
+  const mix = `background-color: color-mix(in srgb, ${value} ${s}%, transparent);`;
+  // Obsidian before 1.2 runs a Chromium without color-mix(): it keeps the
+  // rgba() line and drops the other. Only a hex color can be worked out here.
+  const rgb = hexToRgb(value);
+  return rgb ? `background-color: rgba(${rgb.join(', ')}, ${s / 100}); ${mix}` : mix;
+}
+
+/** `#rgb`, `#rgba`, `#rrggbb` or `#rrggbbaa` as [r, g, b], or null for any other color. */
+export function hexToRgb(value: string): [number, number, number] | null {
+  const m = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(value);
+  if (!m) return null;
+  const hex = m[1].length <= 4 ? [...m[1].slice(0, 3)].map((c) => c + c).join('') : m[1].slice(0, 6);
+  return [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)) as [number, number, number];
+}
+
+/** The picker's swatches take their color from here, not from an inline style. */
+export function swatchCss(settings: FileTreeColorsSettings): string {
+  return settings.palette
+    .map((p) => `.ftc-swatch[data-ftc-swatch="${escapeCssString(p.id)}"] { --ftc-swatch: ${p.value}; }`)
+    .join('\n');
 }
 
 /**
