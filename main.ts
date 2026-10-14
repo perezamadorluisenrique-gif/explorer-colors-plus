@@ -12,7 +12,7 @@ import {
   sanitizeColor,
 } from './src/colors.ts';
 import type { ColorMode, FileTreeColorsSettings } from './src/colors.ts';
-import { buildCss } from './src/css.ts';
+import { buildCss, swatchCss } from './src/css.ts';
 import { convertFileColor, looksLikeFileColor } from './src/importer.ts';
 import { clearEntry, getEntry, removeEntries, renameEntries, setEntry } from './src/paths.ts';
 
@@ -115,7 +115,7 @@ export default class FileTreeColorsPlugin extends Plugin {
   private adopt(doc: Document) {
     if (this.sheets.has(doc) || !doc.defaultView) return;
     const sheet = new doc.defaultView.CSSStyleSheet();
-    sheet.replaceSync(buildCss(this.settings));
+    sheet.replaceSync(sheetCss(this.settings));
     doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet];
     this.sheets.set(doc, sheet);
   }
@@ -129,7 +129,7 @@ export default class FileTreeColorsPlugin extends Plugin {
 
   /** Regenerates the stylesheet of every window from the settings. */
   refresh() {
-    const css = buildCss(this.settings);
+    const css = sheetCss(this.settings);
     for (const sheet of this.sheets.values()) sheet.replaceSync(css);
   }
 
@@ -229,8 +229,10 @@ class ColorPickerModal extends Modal {
     const grid = contentEl.createDiv({ cls: 'ftc-swatches' });
     for (const entry of s.palette) {
       if (!resolveColor(entry.id, s.palette, s.applyTo)) continue;
-      const b = grid.createEl('button', { cls: 'ftc-swatch', attr: { type: 'button', 'aria-label': entry.name, title: entry.name } });
-      b.setCssProps({ '--ftc-swatch': entry.value });
+      const b = grid.createEl('button', {
+        cls: 'ftc-swatch',
+        attr: { type: 'button', 'aria-label': entry.name, title: entry.name, 'data-ftc-swatch': entry.id },
+      });
       if (own?.color === entry.id) b.addClass('is-current');
       b.addEventListener('click', () => apply(entry.id));
     }
@@ -385,3 +387,7 @@ class FileTreeColorsSettingTab extends PluginSettingTab {
   }
 }
 
+/** The plugin's one stylesheet: the explorer's colors and the picker's swatches. */
+function sheetCss(settings: FileTreeColorsSettings): string {
+  return [buildCss(settings), swatchCss(settings)].filter((css) => css !== '').join('\n');
+}

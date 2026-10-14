@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { effectiveColor } from '../src/cascade.ts';
-import { backgroundDeclaration, buildCss, escapeCssString, textDeclarations } from '../src/css.ts';
+import { backgroundDeclaration, buildCss, escapeCssString, hexToRgb, swatchCss, textDeclarations } from '../src/css.ts';
 import { DEFAULT_SETTINGS } from '../src/colors.ts';
 import type { FileTreeColorsSettings } from '../src/colors.ts';
 
@@ -44,7 +44,12 @@ test('text declarations set the explorer color variables; null hands them back t
 });
 
 test('background is a translucent mix with a clamped strength', () => {
-  assert.equal(backgroundDeclaration('#f00', 25), 'background-color: color-mix(in srgb, #f00 25%, transparent);');
+  assert.equal(
+    backgroundDeclaration('#f00', 25),
+    'background-color: rgba(255, 0, 0, 0.25); background-color: color-mix(in srgb, #f00 25%, transparent);',
+  );
+  // Only a hex color gets the rgba() line for apps without color-mix().
+  assert.equal(backgroundDeclaration('red', 25), 'background-color: color-mix(in srgb, red 25%, transparent);');
   assert.match(backgroundDeclaration('#f00', 1), / 5%,/);
   assert.match(backgroundDeclaration('#f00', 900), / 100%,/);
   assert.equal(backgroundDeclaration(null, 25), 'background-color: unset;');
@@ -52,7 +57,7 @@ test('background is a translucent mix with a clamped strength', () => {
 
 test('background rules leave hover, active and selected rows to the theme', () => {
   const css = buildCss(S({ applyTo: 'background', colors: [{ path: 'a', color: 'red' }] }));
-  assert.match(css, /\[data-path="a"\]:not\(\.is-active\):not\(\.is-selected\):not\(:hover\) \{ background-color: color-mix/);
+  assert.match(css, /\[data-path="a"\]:not\(\.is-active\):not\(\.is-selected\):not\(:hover\) \{ background-color: rgba\([^)]*\); background-color: color-mix/);
   assert.doesNotMatch(css, /--nav-item/);
 });
 
@@ -132,4 +137,16 @@ test('effectiveColor ignores entries whose palette color was deleted', () => {
   const s = S({ cascade: true, colors: [{ path: 'a', color: 'red' }, { path: 'a/b', color: 'deleted' }] });
   assert.equal(effectiveColor('a/b/x.md', s)?.entry.path, 'a');
   assert.equal(effectiveColor('a/b', s)?.entry.path, 'a');
+});
+
+test('hexToRgb reads short, long and alpha hex', () => {
+  assert.deepEqual(hexToRgb('#f00'), [255, 0, 0]);
+  assert.deepEqual(hexToRgb('#e5484d'), [229, 72, 77]);
+  assert.deepEqual(hexToRgb('#e5484d80'), [229, 72, 77]);
+  assert.equal(hexToRgb('rgb(1, 2, 3)'), null);
+});
+
+test('each palette color gets a swatch rule, with its id escaped', () => {
+  const css = swatchCss({ ...DEFAULT_SETTINGS, palette: [{ id: 'a"b', name: 'A', value: '#123456' }] });
+  assert.equal(css, '.ftc-swatch[data-ftc-swatch="a\\"b"] { --ftc-swatch: #123456; }');
 });
