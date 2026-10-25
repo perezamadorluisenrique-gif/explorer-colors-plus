@@ -12,9 +12,15 @@
   padding: 0;
   border: 2px solid transparent;
   border-radius: var(--radius-m);
-  background: var(--ftc-swatch);
   box-shadow: none;
   cursor: pointer;
+}
+
+/* Obsidian styles every button (and its :hover) with an interactive-normal
+   background; this repeats the class so the swatch color outranks both. */
+.ftc-swatches .ftc-swatch.ftc-swatch {
+  background-color: var(--ftc-swatch);
+  background-image: none;
 }
 
 .ftc-swatch:hover,
