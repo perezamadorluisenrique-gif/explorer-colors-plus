@@ -2,7 +2,7 @@
 
 Color files and folders in the file explorer, with a palette, cascading to children, and import from File Color.
 
-![Files and folders colored in the Obsidian file explorer](docs/screenshot.png)
+![Files and folders colored in the Obsidian file explorer](https://raw.githubusercontent.com/perezamadorluisenrique-gif/explorer-colors-plus/main/docs/screenshot.png)
 
 ## What it does
 
