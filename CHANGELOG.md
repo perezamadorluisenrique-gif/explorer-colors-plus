@@ -4,6 +4,10 @@ The release workflow uses the section named after the version being released
 as the release description, so every version needs one. `npm version <x.y.z>`
 renames the `Unreleased` heading below to that version.
 
+## 0.1.2
+
+- Fixed the Set color dialog showing blank boxes instead of color swatches: Obsidian's button background was overriding the swatch color, in every theme.
+
 ## 0.1.1
 
 - Needs Obsidian 1.2.7 or later (was 1.0.0). Older versions build the file explorer differently, so no color ever showed there, and the color picker failed to open.

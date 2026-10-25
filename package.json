@@ -1,6 +1,6 @@
 {
   "name": "explorer-colors-plus",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Explorer Colors Plus for Obsidian - Color files and folders in the file explorer, with a palette, cascading to children, and import from File Color.",
   "main": "main.js",
   "scripts": {
