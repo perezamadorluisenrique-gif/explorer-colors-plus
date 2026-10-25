@@ -2,6 +2,8 @@
 
 Color files and folders in the file explorer, with a palette, cascading to children, and import from File Color.
 
+![Files and folders colored in the Obsidian file explorer](docs/screenshot.png)
+
 ## What it does
 
 Right-click any file or folder in the file explorer and choose **Set color**. Pick a color from your palette or any custom color, and the item is tinted in the explorer: its text, its background, or both, plus the folder arrow. Colors follow files when you rename or move them, and disappear when you delete them.
