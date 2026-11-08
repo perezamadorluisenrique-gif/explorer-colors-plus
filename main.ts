@@ -15,6 +15,7 @@ import type { ColorMode, FileTreeColorsSettings } from './src/colors.ts';
 import { buildCss, swatchCss } from './src/css.ts';
 import { convertFileColor, looksLikeFileColor } from './src/importer.ts';
 import { clearEntry, getEntry, removeEntries, renameEntries, setEntry } from './src/paths.ts';
+import { moreDefinitions, renderMore } from './src/more-link.ts';
 
 const FILE_COLOR_ID = 'obsidian-file-color';
 
@@ -302,6 +303,7 @@ class FileTreeColorsSettingTab extends PluginSettingTab {
         heading: 'Migration',
         items: [{ ...TEXT.import, action: () => void this.runImport() }],
       },
+      ...(moreDefinitions() as SettingDefinitionItem[]),
     ];
   }
 
@@ -343,6 +345,7 @@ class FileTreeColorsSettingTab extends PluginSettingTab {
   display(): void {
     this.legacy = true;
     this.draw();
+    renderMore(this.containerEl, (el) => new Setting(el));
   }
 
   private draw() {
